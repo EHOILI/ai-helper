@@ -180,7 +180,8 @@ function Chat() {
     } else if (isQuitting) {
       // --- '그만할래' 퀴즈 모드 처리 ---
       if (quittingQuizProblem) {
-        const userAnswer = parseInt(input.trim());
+        const userAnswerText = input.trim().replace(/개$/, '');
+        const userAnswer = parseInt(userAnswerText);
         if (!isNaN(userAnswer) && userAnswer === quittingQuizProblem.answer) {
           botResponseText = '정답입니다! 오늘 하루도 수고했어요! 다음에 또 만나요!';
           setIsQuitting(false);
@@ -196,7 +197,8 @@ function Chat() {
     } else if (currentUnitQuiz) {
       // --- 단원 평가 퀴즈 모드 처리 ---
       const problem = currentUnitQuiz.problems[currentUnitQuiz.currentIndex];
-      const userAnswer = parseInt(input.trim());
+      const userAnswerText = input.trim().replace(/개$/, '');
+      const userAnswer = parseInt(userAnswerText);
 
       if (!isNaN(userAnswer) && userAnswer === problem.answer) {
         botResponseText = '정답입니다!';
@@ -240,7 +242,8 @@ function Chat() {
       botResponseText = `새로운 문제가 출제되었습니다: ${problem.question} (답변은 숫자로만 입력해주세요.)`;
     } else if (currentProblem) {
       updateLearningProgress({ totalProblemsSolved: (learningProgress.totalProblemsSolved || 0) + 1 });
-      const userAnswer = parseInt(input.trim());
+      const userAnswerText = input.trim().replace(/개$/, '');
+      const userAnswer = parseInt(userAnswerText);
       if (!isNaN(userAnswer) && userAnswer === currentProblem.answer) {
         botResponseText = '정답입니다! 게임 머니 50을 획득했습니다.';
         setGameMoney(prevMoney => prevMoney + 50);

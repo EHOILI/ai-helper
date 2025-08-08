@@ -98,7 +98,9 @@ function ChatPage() {
 
       } else if (isWaitingForAnswer && currentProblem) {
         // User is answering a problem
-        const isCorrect = currentInput.replace(/\s+/g, '') === currentProblem.answer.replace(/\s+/g, '');
+        const userAnswer = currentInput.replace(/\s+/g, '').replace(/개$/, '');
+        const correctAnswer = currentProblem.answer.replace(/\s+/g, '');
+        const isCorrect = userAnswer === correctAnswer;
         let aiResponse = '';
         if (isCorrect) {
           aiResponse = `정답입니다! 100 게임 머니와 10 XP를 획득하셨어요! 🎉`;
