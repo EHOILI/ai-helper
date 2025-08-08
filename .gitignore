@@ -1,0 +1,26 @@
+# Dependencies
+/node_modules
+/ai-homework-helper/node_modules
+/ai-homework-helper-backend/node_modules
+
+# Cache
+/.npm-cache
+/ai-homework-helper/.npm-cache
+/ai-homework-helper-backend/.npm-cache
+
+# Build output
+/ai-homework-helper/build
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+/ai-homework-helper-backend/.npm-cache/_logs
+/ai-homework-helper/.npm-cache/_logs
+
+# Environment variables
+.env
+/ai-homework-helper-backend/.env
+
+# macOS
+.DS_Store
