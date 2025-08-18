@@ -1,8 +1,30 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const fs = require('fs').promises;
+const path = require('path');
 
-// In-memory user store (for prototyping)
-const users = [];
+const usersFilePath = path.join(__dirname, '..', 'data', 'users.json');
+
+// Helper function to read users from file
+const readUsers = async () => {
+  try {
+    const data = await fs.readFile(usersFilePath, 'utf8');
+    return JSON.parse(data);
+  } catch (error) {
+    // If file doesn't exist or is empty, return empty array
+    if (error.code === 'ENOENT') {
+      return [];
+    }
+    throw error;
+  }
+};
+
+// Helper function to write users to file
+const writeUsers = async (users) => {
+  await fs.writeFile(usersFilePath, JSON.stringify(users, null, 2), 'utf8');
+};
+
+
 const JWT_SECRET = 'your-super-secret-key-change-it-later'; // It's better to use environment variables for this
 
 // @desc    Register a new user
@@ -13,6 +35,8 @@ const registerUser = async (req, res) => {
   if (!username || !password) {
     return res.status(400).json({ message: 'Please enter all fields' });
   }
+
+  const users = await readUsers();
 
   // Check if user already exists
   const userExists = users.find((user) => user.username === username);
@@ -27,6 +51,7 @@ const registerUser = async (req, res) => {
   // Create user object
   const user = { id: users.length + 1, username, password: hashedPassword };
   users.push(user);
+  await writeUsers(users);
 
   // Create token
   const token = jwt.sign({ id: user.id }, JWT_SECRET, { expiresIn: '1h' });
@@ -41,6 +66,7 @@ const registerUser = async (req, res) => {
 // @route   POST /api/users/login
 const loginUser = async (req, res) => {
   const { username, password } = req.body;
+  const users = await readUsers();
 
   // Check for user
   const user = users.find((user) => user.username === username);

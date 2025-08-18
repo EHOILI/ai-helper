@@ -12,13 +12,34 @@ const port = 3001;
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-// --- In-memory database for debugging ---
-const users = [];
-const JWT_SECRET = 'your-super-secret-key-change-it-later';
+const fs = require('fs').promises;
+const path = require('path');
+
+const usersFilePath = path.join(__dirname, 'data', 'users.json');
+
+// Helper functions to read and write users from file
+const readUsers = async () => {
+  try {
+    const data = await fs.readFile(usersFilePath, 'utf8');
+    return JSON.parse(data);
+  } catch (error) {
+    if (error.code === 'ENOENT') return [];
+    throw error;
+  }
+};
+
+const writeUsers = async (users) => {
+  await fs.writeFile(usersFilePath, JSON.stringify(users, null, 2), 'utf8');
+};
 
 // --- Middlewares ---
 app.use(cors());
 app.use(express.json());
+
+// --- Routes ---
+const userRoutes = require('./routes/userRoutes');
+app.use('/api/users', userRoutes);
+
 
 // --- AI Explanation Route ---
 app.post('/api/explain', async (req, res) => {
@@ -98,17 +119,19 @@ app.post('/api/generate-problem', async (req, res) => {
 
 
 // --- User Progress Update Route ---
-app.post('/api/user/update-progress', (req, res) => {
+app.post('/api/user/update-progress', async (req, res) => {
   try {
     const { userId } = req.body;
     if (userId === undefined) {
       return res.status(400).json({ message: 'User ID is required' });
     }
 
-    const user = users.find(u => u.id === userId);
-    if (!user) {
+    const users = await readUsers();
+    const userIndex = users.findIndex(u => u.id === userId);
+    if (userIndex === -1) {
       return res.status(404).json({ message: 'User not found' });
     }
+    const user = users[userIndex];
 
     const isBoosterActive = user.xpBoosterExpires && user.xpBoosterExpires > Date.now();
     const xpGained = isBoosterActive ? 20 : 10;
@@ -127,6 +150,8 @@ app.post('/api/user/update-progress', (req, res) => {
     }
 
     const reputationChanged = oldReputation !== user.reputation;
+    
+    await writeUsers(users);
 
     res.status(200).json({
       message: 'Progress updated successfully',
@@ -150,17 +175,19 @@ app.post('/api/user/update-progress', (req, res) => {
 
 
 // --- Easter Egg Route ---
-app.post('/api/user/easter-egg', (req, res) => {
+app.post('/api/user/easter-egg', async (req, res) => {
   try {
     const { userId } = req.body;
     if (userId === undefined) {
       return res.status(400).json({ message: 'User ID is required' });
     }
 
-    const user = users.find(u => u.id === userId);
-    if (!user) {
+    const users = await readUsers();
+    const userIndex = users.findIndex(u => u.id === userId);
+    if (userIndex === -1) {
       return res.status(404).json({ message: 'User not found' });
     }
+    const user = users[userIndex];
 
     const isBoosterActive = user.xpBoosterExpires && user.xpBoosterExpires > Date.now();
     const xpGained = isBoosterActive ? 1000 : 500;
@@ -179,6 +206,8 @@ app.post('/api/user/easter-egg', (req, res) => {
     }
 
     const reputationChanged = oldReputation !== user.reputation;
+
+    await writeUsers(users);
 
     res.status(200).json({
       message: 'Easter egg reward granted!',
@@ -201,17 +230,19 @@ app.post('/api/user/easter-egg', (req, res) => {
 });
 
 // --- Shop Route ---
-app.post('/api/shop/buy', (req, res) => {
+app.post('/api/shop/buy', async (req, res) => {
   try {
     const { userId, itemName, itemCost } = req.body;
     if (userId === undefined || !itemName || itemCost === undefined) {
       return res.status(400).json({ message: 'User ID, item name, and item cost are required' });
     }
 
-    const user = users.find(u => u.id === userId);
-    if (!user) {
+    const users = await readUsers();
+    const userIndex = users.findIndex(u => u.id === userId);
+    if (userIndex === -1) {
       return res.status(404).json({ message: 'User not found' });
     }
+    const user = users[userIndex];
 
     if (user.money < itemCost) {
       return res.status(400).json({ message: '머니가 부족합니다.' });
@@ -233,6 +264,8 @@ app.post('/api/shop/buy', (req, res) => {
 
     user.money -= itemCost;
 
+    await writeUsers(users);
+
     res.status(200).json({
       message: 'Purchase successful!',
       user: {
@@ -253,94 +286,7 @@ app.post('/api/shop/buy', (req, res) => {
 });
 
 
-// --- Auth Routes ---
 
-app.get('/api/status', (req, res) => {
-  res.send('AI Homework Helper Backend is running!');
-});
-
-app.post('/api/users/register', async (req, res) => {
-  try {
-    const { username, password } = req.body;
-
-    if (!username || !password) {
-      return res.status(400).json({ message: 'Please enter all fields' });
-    }
-
-    const userExists = users.find((user) => user.username === username);
-    if (userExists) {
-      return res.status(400).json({ message: 'User already exists' });
-    }
-
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
-
-    const user = { 
-      id: users.length + 1, 
-      username, 
-      password: hashedPassword,
-      xp: 0,
-      money: 0,
-      reputation: '스타터',
-      inventory: [],
-      xpBoosterExpires: null,
-    };
-    users.push(user);
-    console.log('User registered:', user); // Log for debugging
-
-    const token = jwt.sign({ id: user.id }, JWT_SECRET, { expiresIn: '1h' });
-
-    res.status(201).json({
-      token,
-      user: { 
-        id: user.id, 
-        username: user.username,
-        xp: user.xp,
-        money: user.money,
-        reputation: user.reputation,
-        inventory: user.inventory,
-        xpBoosterExpires: user.xpBoosterExpires,
-      },
-    });
-  } catch (error) {
-    console.error('Error in /api/users/register:', error);
-    res.status(500).json({ message: 'Server error' });
-  }
-});
-
-app.post('/api/users/login', async (req, res) => {
-  try {
-    const { username, password } = req.body;
-
-    const user = users.find((user) => user.username === username);
-    if (!user) {
-      return res.status(400).json({ message: 'Invalid credentials' });
-    }
-
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      return res.status(400).json({ message: 'Invalid credentials' });
-    }
-
-    const token = jwt.sign({ id: user.id }, JWT_SECRET, { expiresIn: '1h' });
-
-    res.status(200).json({
-      token,
-      user: { 
-        id: user.id, 
-        username: user.username,
-        xp: user.xp || 0,
-        money: user.money || 0,
-        reputation: user.reputation || '스타터',
-        inventory: user.inventory || [],
-        xpBoosterExpires: user.xpBoosterExpires || null,
-      },
-    });
-  } catch (error) {
-    console.error('Error in /api/users/login:', error);
-    res.status(500).json({ message: 'Server error' });
-  }
-});
 
 
 app.listen(port, () => {
