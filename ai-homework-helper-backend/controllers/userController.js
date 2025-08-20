@@ -49,7 +49,16 @@ const registerUser = async (req, res) => {
   const hashedPassword = await bcrypt.hash(password, salt);
 
   // Create user object
-  const user = { id: users.length + 1, username, password: hashedPassword };
+  const user = { 
+    id: users.length > 0 ? Math.max(...users.map(u => u.id)) + 1 : 1, 
+    username, 
+    password: hashedPassword, 
+    xp: 0, 
+    money: 0, 
+    reputation: '루키', 
+    inventory: [], 
+    xpBoosterExpires: null 
+  };
   users.push(user);
   await writeUsers(users);
 
