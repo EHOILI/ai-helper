@@ -76,12 +76,10 @@ app.post('/api/generate-problem', async (req, res) => {
       2.  **학습 단원**: ${semester} '${unit}'
       3.  **요청사항**: 위 학습 단원의 핵심 개념을 활용하는, 너무 쉽지도 어렵지도 않은 적당한 난이도의 서술형 또는 단답형 문제를 출제해주세요.
       4.  **출력 형식**: 반드시 다음 JSON 형식에 맞춰 문제와 정답(풀이과정 없이 답만)을 각각의 필드에 담아 출력해주세요.
-          ```
-          {
-            "problem": "여기에 문제를 작성하세요.",
-            "answer": "여기에 정답을 작성하세요."
-          }
-          ```
+          // {
+          //   "problem": "여기에 문제를 작성하세요.",
+          //   "answer": "여기에 정답을 작성하세요."
+          // }
     `;
 
     const result = await model.generateContent(prompt);
