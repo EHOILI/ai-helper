@@ -145,60 +145,8 @@ const updateUserProgress = async (req, res) => {
   }
 };
 
-const updateProgress = async (req, res) => {
-  try {
-    const { userId } = req.body;
-    if (userId === undefined) {
-      return res.status(400).json({ message: 'User ID is required' });
-    }
-
-    const users = await readUsers();
-    const userIndex = users.findIndex(u => u.id === userId);
-    if (userIndex === -1) {
-      return res.status(404).json({ message: 'User not found' });
-    }
-    const user = users[userIndex];
-
-    const isBoosterActive = user.xpBoosterExpires && user.xpBoosterExpires > Date.now();
-    const xpGained = isBoosterActive ? 20 : 10; // 2x XP with booster
-
-    user.money += 100;
-    user.xp += xpGained;
-
-    const oldReputation = user.reputation;
-    if (user.xp >= 500) {
-      user.reputation = '프로';
-    } else if (user.xp >= 250) {
-      user.reputation = '미들';
-    } else if (user.xp >= 50) {
-      user.reputation = '루키';
-    }
-    const reputationChanged = oldReputation !== user.reputation;
-
-    await writeUsers(users);
-
-    res.status(200).json({
-      message: 'User progress updated successfully',
-      user: {
-        id: user.id,
-        username: user.username,
-        xp: user.xp,
-        money: user.money,
-        reputation: user.reputation,
-        inventory: user.inventory,
-        xpBoosterExpires: user.xpBoosterExpires,
-      },
-      reputationChanged,
-    });
-
-  } catch (error) {
-    console.error('Error in updateProgress:', error);
-    res.status(500).json({ message: 'Failed to update user progress' });
-  }
-};
-
 module.exports = {
-  register,
-  login,
-  updateProgress
+  registerUser,
+  loginUser,
+  updateUserProgress
 };
