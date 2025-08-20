@@ -16,7 +16,7 @@ function LoginPage() {
     try {
       await login(username, password);
     } catch (err) {
-      setError('로그인 정보가 올바르지 않습니다. 다시 시도해주세요.');
+      setError(err instanceof Error ? err.message : JSON.stringify(err));
       console.error(err);
     }
   };

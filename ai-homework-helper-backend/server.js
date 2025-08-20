@@ -1,3 +1,4 @@
+console.log('Server code version 2 running');
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
@@ -14,23 +15,6 @@ const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
 const fs = require('fs').promises;
 const path = require('path');
-
-const usersFilePath = path.join(__dirname, 'data', 'users.json');
-
-// Helper functions to read and write users from file
-const readUsers = async () => {
-  try {
-    const data = await fs.readFile(usersFilePath, 'utf8');
-    return JSON.parse(data);
-  } catch (error) {
-    if (error.code === 'ENOENT') return [];
-    throw error;
-  }
-};
-
-const writeUsers = async (users) => {
-  await fs.writeFile(usersFilePath, JSON.stringify(users, null, 2), 'utf8');
-};
 
 // --- Middlewares ---
 app.use(cors());
@@ -92,12 +76,12 @@ app.post('/api/generate-problem', async (req, res) => {
       2.  **학습 단원**: ${semester} '${unit}'
       3.  **요청사항**: 위 학습 단원의 핵심 개념을 활용하는, 너무 쉽지도 어렵지도 않은 적당한 난이도의 서술형 또는 단답형 문제를 출제해주세요.
       4.  **출력 형식**: 반드시 다음 JSON 형식에 맞춰 문제와 정답(풀이과정 없이 답만)을 각각의 필드에 담아 출력해주세요.
-          \`\`\`json
+          ```json
           {
             "problem": "여기에 문제를 작성하세요.",
             "answer": "여기에 정답을 작성하세요."
           }
-          \`\`\`
+          ```
     `;
 
     const result = await model.generateContent(prompt);
@@ -107,69 +91,23 @@ app.post('/api/generate-problem', async (req, res) => {
     // Clean up the response to make sure it's valid JSON
     text = text.replace(/```json/g, '').replace(/```/g, '').trim();
     
-    const problemData = JSON.parse(text);
+    let problemData;
+    try {
+      problemData = JSON.parse(text);
+    } catch (parseError) {
+      console.error('Failed to parse JSON from AI response:', text);
+      // Send a structured error to the frontend
+      return res.status(500).json({ 
+        message: 'AI 응답을 처리하는 중 오류가 발생했습니다.',
+        error: 'Invalid JSON format from AI.'
+      });
+    }
 
     res.status(200).json(problemData);
 
   } catch (error) {
     console.error('Error in /api/generate-problem:', error);
     res.status(500).json({ message: 'AI 문제 생성 중 오류가 발생했습니다.' });
-  }
-});
-
-
-// --- User Progress Update Route ---
-app.post('/api/user/update-progress', async (req, res) => {
-  try {
-    const { userId } = req.body;
-    if (userId === undefined) {
-      return res.status(400).json({ message: 'User ID is required' });
-    }
-
-    const users = await readUsers();
-    const userIndex = users.findIndex(u => u.id === userId);
-    if (userIndex === -1) {
-      return res.status(404).json({ message: 'User not found' });
-    }
-    const user = users[userIndex];
-
-    const isBoosterActive = user.xpBoosterExpires && user.xpBoosterExpires > Date.now();
-    const xpGained = isBoosterActive ? 20 : 10;
-
-    user.money += 100;
-    user.xp += xpGained;
-
-    // Update reputation based on XP
-    const oldReputation = user.reputation;
-    if (user.xp >= 500) {
-      user.reputation = '프로';
-    } else if (user.xp >= 250) {
-      user.reputation = '미들';
-    } else if (user.xp >= 50) {
-      user.reputation = '루키';
-    }
-
-    const reputationChanged = oldReputation !== user.reputation;
-    
-    await writeUsers(users);
-
-    res.status(200).json({
-      message: 'Progress updated successfully',
-      user: {
-        id: user.id,
-        username: user.username,
-        xp: user.xp,
-        money: user.money,
-        reputation: user.reputation,
-        inventory: user.inventory,
-        xpBoosterExpires: user.xpBoosterExpires,
-      },
-      reputationChanged,
-    });
-
-  } catch (error) {
-    console.error('Error in /api/user/update-progress:', error);
-    res.status(500).json({ message: 'Failed to update user progress' });
   }
 });
 

@@ -38,7 +38,7 @@ function SelectionPage() {
     if (!user) return;
 
     try {
-      const response = await axios.post('http://localhost:3001/api/shop/buy', {
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/shop/buy`, {
         userId: user.user.id,
         itemName,
         itemCost,

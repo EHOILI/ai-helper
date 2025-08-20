@@ -1,7 +1,8 @@
 
 import axios from 'axios';
 
-const API_URL = 'http://localhost:3001/api/users/';
+// Temporarily hardcode the production API URL to fix deployment issues
+const API_URL = `${process.env.REACT_APP_API_URL}/api/users/`;
 
 const register = (username: string, password: string) => {
   return axios.post(API_URL + 'register', {

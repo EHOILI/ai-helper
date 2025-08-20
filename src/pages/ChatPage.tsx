@@ -62,7 +62,7 @@ function ChatPage() {
   const triggerReward = async () => {
     if (!user) return;
     try {
-      const response = await axios.post('http://localhost:3001/api/user/update-progress', { userId: user.user.id });
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/users/update-progress`, { userId: user.user.id });
       updateUser(response.data.user);
       if (response.data.reputationChanged) {
         // Add a special message for rank up
@@ -87,7 +87,7 @@ function ChatPage() {
     try {
       if (currentInput === '//easter egg') {
         if (!user) return;
-        const response = await axios.post('http://localhost:3001/api/user/easter-egg', { userId: user.user.id });
+        const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/user/easter-egg`, { userId: user.user.id });
         updateUser(response.data.user);
         
         let messagesToAdd = [{ sender: 'ai' as const, text: "축하합니다! 이스터 에그를 발견하셨네요! 500 XP와 100,000 게임 머니를 드립니다! 💎" }];
@@ -99,7 +99,7 @@ function ChatPage() {
       } else if (isWaitingForAnswer && currentProblem) {
         // User is answering a problem
         const userAnswer = currentInput.replace(/\s+/g, '').replace(/개$/, '');
-        const correctAnswer = currentProblem.answer.replace(/\s+/g, '');
+        const correctAnswer = currentProblem.answer.replace(/\s+/g, '').replace(/개$/, '');
         const isCorrect = userAnswer === correctAnswer;
         let aiResponse = '';
         if (isCorrect) {
@@ -114,7 +114,7 @@ function ChatPage() {
 
       } else if (isWaitingForQuestion) {
         // User is asking for an explanation
-        const response = await axios.post('http://localhost:3001/api/explain', {
+        const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/explain`, {
           question: currentInput,
           context: { school, grade, semester, unit }
         });
@@ -124,7 +124,7 @@ function ChatPage() {
 
       } else if (currentInput === '/문제') {
         // User wants a problem
-        const response = await axios.post('http://localhost:3001/api/generate-problem', {
+        const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/generate-problem`, {
           context: { school, grade, semester, unit }
         });
         const { problem, answer } = response.data;

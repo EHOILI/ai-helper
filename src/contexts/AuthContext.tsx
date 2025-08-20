@@ -48,10 +48,14 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const login = async (username: string, password: string) => {
     try {
       const response = await authService.login(username, password);
-      console.log('Login successful, server response:', response.data);
-      localStorage.setItem('user', JSON.stringify(response.data));
-      setUser(response.data);
-      navigate('/');
+      if (response && response.data) {
+        console.log('Login successful, server response:', response.data);
+        localStorage.setItem('user', JSON.stringify(response.data));
+        setUser(response.data);
+        navigate('/');
+      } else {
+        throw new Error('Login failed: Invalid response from server');
+      }
     } catch (error) {
       console.error('Login failed:', error);
       throw error;
@@ -61,9 +65,13 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const register = async (username: string, password: string) => {
     try {
       const response = await authService.register(username, password);
-      localStorage.setItem('user', JSON.stringify(response.data));
-      setUser(response.data);
-      navigate('/');
+      if (response && response.data) {
+        localStorage.setItem('user', JSON.stringify(response.data));
+        setUser(response.data);
+        navigate('/');
+      } else {
+        throw new Error('Registration failed: Invalid response from server');
+      }
     } catch (error) {
       console.error('Registration failed:', error);
       throw error;
