@@ -6,6 +6,7 @@ import RegisterPage from './pages/RegisterPage';
 import ChatPage from './pages/ChatPage';
 import GamePage from './pages/GamePage';
 import SelectionPage from './pages/SelectionPage';
+import RankingPage from './pages/RankingPage';
 import './App.css';
 
 function App() {
@@ -17,6 +18,7 @@ function App() {
       <Route path="/chat" element={<ChatPage />} />
       <Route path="/game" element={<GamePage />} />
       <Route path="/select" element={<SelectionPage />} />
+      <Route path="/ranking" element={<RankingPage />} />
     </Routes>
   );
 }

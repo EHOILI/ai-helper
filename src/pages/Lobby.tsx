@@ -70,12 +70,39 @@ function Lobby() {
                 sx={{ 
                   py: 2, 
                   px: 4, 
+                  mr: 2,
                   borderRadius: '50px', 
                   fontWeight: 'bold',
                   boxShadow: '0 4px 15px rgba(0, 0, 0, 0.2)'
                 }}
               >
                 학습 시작하기
+              </Button>
+              <Button
+                variant="outlined"
+                size="large"
+                onClick={() => navigate('/ranking')}
+                sx={{ 
+                  py: 2, 
+                  px: 4, 
+                  borderRadius: '50px', 
+                  fontWeight: 'bold',
+                }}
+              >
+                랭킹보기
+              </Button>
+              <Button
+                variant="outlined"
+                size="large"
+                onClick={() => window.open('https://fossil-leo.github.io/pasta/', '_blank')}
+                sx={{ 
+                  py: 2, 
+                  px: 4, 
+                  borderRadius: '50px', 
+                  fontWeight: 'bold',
+                }}
+              >
+                게임하기
               </Button>
             </Box>
           ) : (

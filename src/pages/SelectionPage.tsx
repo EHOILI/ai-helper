@@ -80,7 +80,7 @@ function SelectionPage() {
           <Button variant="contained" size="large" startIcon={<ChatIcon />} onClick={() => navigate('/chat')} sx={{ py: 1.5, borderRadius: '50px', fontWeight: 'bold' }}>
             채팅하기
           </Button>
-          <Button variant="contained" size="large" color="secondary" startIcon={<SportsEsportsIcon />} onClick={() => navigate('/game')} sx={{ py: 1.5, borderRadius: '50px', fontWeight: 'bold' }}>
+          <Button variant="contained" size="large" color="secondary" startIcon={<SportsEsportsIcon />} onClick={() => window.open('https://fossil-leo.github.io/pasta/', '_blank')} sx={{ py: 1.5, borderRadius: '50px', fontWeight: 'bold' }}>
             게임하기
           </Button>
           <Button variant="outlined" size="large" startIcon={<AccountCircleIcon />} onClick={() => setReputationOpen(true)} sx={{ py: 1.5, borderRadius: '50px', fontWeight: 'bold' }}>

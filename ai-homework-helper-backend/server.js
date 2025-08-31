@@ -1,20 +1,22 @@
 console.log('Server code version 2 running');
 require('dotenv').config();
+const connectDB = require('./config/db');
 const express = require('express');
 const cors = require('cors');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
+const User = require('./models/userModel'); // Import User model
 
 const app = express();
 const port = 3001;
 
-// --- AI Model Setup ---
+// --- AI Model Setup -- -
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
-const fs = require('fs').promises;
-const path = require('path');
+// Connect to database
+connectDB();
 
 // --- Middlewares ---
 app.use(cors());
@@ -23,6 +25,12 @@ app.use(express.json());
 // --- Routes ---
 const userRoutes = require('./routes/userRoutes');
 app.use('/api/users', userRoutes);
+
+const rankingRoutes = require('./routes/rankingRoutes');
+app.use('/api/ranking', rankingRoutes);
+
+const schoolRoutes = require('./routes/schoolRoutes');
+app.use('/api/schools', schoolRoutes);
 
 
 // --- AI Explanation Route ---
@@ -118,12 +126,10 @@ app.post('/api/user/easter-egg', async (req, res) => {
       return res.status(400).json({ message: 'User ID is required' });
     }
 
-    const users = await readUsers();
-    const userIndex = users.findIndex(u => u.id === userId);
-    if (userIndex === -1) {
+    const user = await User.findById(userId);
+    if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
-    const user = users[userIndex];
 
     const isBoosterActive = user.xpBoosterExpires && user.xpBoosterExpires > Date.now();
     const xpGained = isBoosterActive ? 1000 : 500;
@@ -143,18 +149,18 @@ app.post('/api/user/easter-egg', async (req, res) => {
 
     const reputationChanged = oldReputation !== user.reputation;
 
-    await writeUsers(users);
+    const updatedUser = await user.save();
 
     res.status(200).json({
       message: 'Easter egg reward granted!',
       user: {
-        id: user.id,
-        username: user.username,
-        xp: user.xp,
-        money: user.money,
-        reputation: user.reputation,
-        inventory: user.inventory,
-        xpBoosterExpires: user.xpBoosterExpires,
+        id: updatedUser._id,
+        username: updatedUser.username,
+        xp: updatedUser.xp,
+        money: updatedUser.money,
+        reputation: updatedUser.reputation,
+        inventory: updatedUser.inventory,
+        xpBoosterExpires: updatedUser.xpBoosterExpires,
       },
       reputationChanged,
     });
@@ -173,12 +179,10 @@ app.post('/api/shop/buy', async (req, res) => {
       return res.status(400).json({ message: 'User ID, item name, and item cost are required' });
     }
 
-    const users = await readUsers();
-    const userIndex = users.findIndex(u => u.id === userId);
-    if (userIndex === -1) {
+    const user = await User.findById(userId);
+    if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
-    const user = users[userIndex];
 
     if (user.money < itemCost) {
       return res.status(400).json({ message: '머니가 부족합니다.' });
@@ -200,18 +204,18 @@ app.post('/api/shop/buy', async (req, res) => {
 
     user.money -= itemCost;
 
-    await writeUsers(users);
+    const updatedUser = await user.save();
 
     res.status(200).json({
       message: 'Purchase successful!',
       user: {
-        id: user.id,
-        username: user.username,
-        xp: user.xp,
-        money: user.money,
-        reputation: user.reputation,
-        inventory: user.inventory,
-        xpBoosterExpires: user.xpBoosterExpires,
+        id: updatedUser._id,
+        username: updatedUser.username,
+        xp: updatedUser.xp,
+        money: updatedUser.money,
+        reputation: updatedUser.reputation,
+        inventory: updatedUser.inventory,
+        xpBoosterExpires: updatedUser.xpBoosterExpires,
       },
     });
 
@@ -220,10 +224,6 @@ app.post('/api/shop/buy', async (req, res) => {
     res.status(500).json({ message: 'Failed to process purchase' });
   }
 });
-
-
-
-
 
 app.listen(port, () => {
   console.log(`Backend server is running on port ${port}`);
