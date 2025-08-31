@@ -7,8 +7,8 @@
 6 silly config load:file:/usr/local/etc/npmrc
 7 verbose title npm run deploy
 8 verbose argv "run" "deploy"
-9 verbose logfile logs-max:10 dir:/Users/jeongjuhui/Downloads/ai-helper/.npm-cache/_logs/2025-08-21T01_54_15_439Z-
-10 verbose logfile /Users/jeongjuhui/Downloads/ai-helper/.npm-cache/_logs/2025-08-21T01_54_15_439Z-debug-0.log
+9 verbose logfile logs-max:10 dir:/Users/jeongjuhui/Downloads/ai-helper/.npm-cache/_logs/2025-08-31T08_22_56_660Z-
+10 verbose logfile /Users/jeongjuhui/Downloads/ai-helper/.npm-cache/_logs/2025-08-31T08_22_56_660Z-debug-0.log
 11 silly logfile start cleaning logs, removing 1 files
 12 silly logfile done cleaning log files
 13 verbose cwd /Users/jeongjuhui/Downloads/ai-helper

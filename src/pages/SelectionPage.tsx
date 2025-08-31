@@ -89,6 +89,9 @@ function SelectionPage() {
           <Button variant="outlined" size="large" color="success" startIcon={<StorefrontIcon />} onClick={() => setShopOpen(true)} sx={{ py: 1.5, borderRadius: '50px', fontWeight: 'bold' }}>
             아이템 상점
           </Button>
+          <Button variant="outlined" size="large" color="info" startIcon={<AccountCircleIcon />} onClick={() => navigate('/ranking')} sx={{ py: 1.5, borderRadius: '50px', fontWeight: 'bold' }}>
+            랭킹보기
+          </Button>
         </Box>
       </Box>
 
