@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 
 // Define the shape of the user object
 interface User {
-  id: number;
+  id: string;
   username: string;
   xp: number;
   money: number;
