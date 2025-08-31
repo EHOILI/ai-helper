@@ -16,6 +16,7 @@ interface Message {
 
 interface Problem {
   problem: string;
+  options: string[];
   answer: string;
 }
 
@@ -34,6 +35,7 @@ function ChatPage() {
   const [currentProblem, setCurrentProblem] = useState<Problem | null>(null);
   const [isWaitingForAnswer, setIsWaitingForAnswer] = useState(false);
   const [isWaitingForQuestion, setIsWaitingForQuestion] = useState(false);
+  const [options, setOptions] = useState<string[]>([]);
 
   const chatEndRef = useRef<null | HTMLDivElement>(null);
 
@@ -48,6 +50,7 @@ function ChatPage() {
       setIsWaitingForQuestion(false);
       setIsWaitingForAnswer(false);
       setCurrentProblem(null);
+      setOptions([]);
       setMessages([
         {
           sender: 'ai',
@@ -75,14 +78,15 @@ function ChatPage() {
     }
   };
 
-  const handleSendMessage = async () => {
-    if (!userInput.trim() || isLoading) return;
+  const handleSendMessage = async (message?: string) => {
+    const currentInput = message ?? userInput.trim();
+    if (!currentInput || isLoading) return;
 
-    const userMessage: Message = { sender: 'user', text: userInput };
+    const userMessage: Message = { sender: 'user', text: currentInput };
     setMessages(prev => [...prev, userMessage]);
-    const currentInput = userInput.trim();
     setUserInput('');
     setIsLoading(true);
+    setOptions([]); // Clear options after user makes a choice
 
     try {
       if (currentInput === '//easter egg') {
@@ -98,9 +102,7 @@ function ChatPage() {
 
       } else if (isWaitingForAnswer && currentProblem) {
         // User is answering a problem
-        const userAnswer = currentInput.replace(/\s+/g, '').replace(/개$/, '');
-        const correctAnswer = currentProblem.answer.replace(/\s+/g, '').replace(/개$/, '');
-        const isCorrect = userAnswer === correctAnswer;
+        const isCorrect = currentInput.trim() === currentProblem.answer.trim();
         let aiResponse = '';
         if (isCorrect) {
           aiResponse = `정답입니다! 100 게임 머니와 10 XP를 획득하셨어요! 🎉`;
@@ -127,9 +129,10 @@ function ChatPage() {
         const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/generate-problem`, {
           context: { school, grade, semester, unit }
         });
-        const { problem, answer } = response.data;
-        setCurrentProblem({ problem, answer });
+        const { problem, options, answer } = response.data;
+        setCurrentProblem({ problem, options, answer });
         setMessages(prev => [...prev, { sender: 'ai', text: problem }]);
+        setOptions(options);
         setIsWaitingForAnswer(true);
 
       } else if (currentInput === '/해설') {
@@ -147,6 +150,10 @@ function ChatPage() {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleOptionClick = (option: string) => {
+    handleSendMessage(option);
   };
 
   const gradeList = school ? Object.keys(curriculum[school]) : [];
@@ -219,6 +226,15 @@ function ChatPage() {
             {isLoading && <ListItem sx={{ justifyContent: 'center' }}><CircularProgress size={24} sx={{ color: 'white' }} /></ListItem>}
             <div ref={chatEndRef} />
           </List>
+          {options.length > 0 && (
+            <Box sx={{ p: 2, display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: 1, borderTop: '1px solid rgba(255, 255, 255, 0.2)' }}>
+              {options.map((option, index) => (
+                <Button key={index} variant="contained" onClick={() => handleOptionClick(option)} disabled={isLoading}>
+                  {option}
+                </Button>
+              ))}
+            </Box>
+          )}
           <Box sx={{ p: 2, display: 'flex', borderTop: '1px solid rgba(255, 255, 255, 0.2)' }}>
             <TextField
               fullWidth
@@ -227,7 +243,7 @@ function ChatPage() {
               value={userInput}
               onChange={(e) => setUserInput(e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-              disabled={isLoading}
+              disabled={isLoading || isWaitingForAnswer}
               sx={{
                 mr: 1,
                 '& .MuiOutlinedInput-root': {
@@ -238,7 +254,7 @@ function ChatPage() {
                 },
               }}
             />
-            <Button variant="contained" onClick={handleSendMessage} disabled={isLoading}>
+            <Button variant="contained" onClick={() => handleSendMessage()} disabled={isLoading || isWaitingForAnswer}>
               {isLoading ? <CircularProgress size={24} /> : '전송'}
             </Button>
           </Box>
