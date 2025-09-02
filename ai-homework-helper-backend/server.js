@@ -19,7 +19,12 @@ const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 connectDB();
 
 // --- Middlewares ---
-app.use(cors());
+const corsOptions = {
+  origin: 'https://ehoili.github.io',
+  optionsSuccessStatus: 200
+};
+
+app.use(cors({ origin: '*' }));
 app.use(express.json());
 
 // --- Routes ---
