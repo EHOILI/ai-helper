@@ -8,7 +8,7 @@ const getSchoolList = (req, res) => {
   const results = [];
   const filePath = path.join(__dirname, '../data/school_list.csv');
 
-  fs.createReadStream(filePath)
+  fs.createReadStream(filePath, { encoding: 'utf-8' })
     .pipe(csv())
     .on('data', (data) => {
       if (data['학교명']) {
