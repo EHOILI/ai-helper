@@ -6,7 +6,7 @@ const csv = require('csv-parser');
 // @route   GET /api/schools
 const getSchoolList = (req, res) => {
   const results = [];
-  const filePath = path.join(process.cwd(), 'data', 'school_list.csv');
+  const filePath = path.join(__dirname, '../data/school_list.csv');
 
   fs.createReadStream(filePath)
     .pipe(csv({ bom: true })) // BOM header removal
