@@ -20,7 +20,7 @@ connectDB();
 
 // --- Middlewares ---
 const corsOptions = {
-  origin: 'https://ehoili.github.io',
+  origin: ['https://ehoili.github.io', 'http://localhost:3000'],
   optionsSuccessStatus: 200
 };
 
