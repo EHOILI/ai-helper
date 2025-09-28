@@ -1,38 +1,19 @@
-import React, { useState, useEffect } from 'react';
-import { Container, Box, TextField, Button, Typography, Alert, Autocomplete } from '@mui/material';
+import React, { useState } from 'react';
+import { Container, Box, TextField, Button, Typography, Alert } from '@mui/material';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import authService from '../api/authService';
 
 function RegisterPage() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [school, setSchool] = useState<string | null>(null);
-  const [schools, setSchools] = useState<string[]>([]);
   const [error, setError] = useState('');
   const { register } = useAuth();
-
-  useEffect(() => {
-    const fetchSchools = async () => {
-      try {
-        const response = await authService.getSchools();
-        setSchools(response.data);
-      } catch (error) {
-        console.error('Failed to fetch schools:', error);
-      }
-    };
-    fetchSchools();
-  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(''); // Clear previous errors
-    if (!school) {
-      setError('Please select a school');
-      return;
-    }
     try {
-      await register(username, password, school);
+      await register(username, password);
     } catch (err: any) {
       // Set error message from backend response if it exists, otherwise a generic one
       const message = err.response?.data?.message || 'An unexpected error occurred. Please try again.';
@@ -78,13 +59,6 @@ function RegisterPage() {
             autoComplete="new-password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-          />
-          <Autocomplete
-            options={schools}
-            onChange={(event, newValue) => {
-              setSchool(newValue);
-            }}
-            renderInput={(params) => <TextField {...params} label="School" required margin="normal" />}
           />
           <Button
             type="submit"

@@ -29,8 +29,8 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "predeploy": "rm -rf ./node_modules/.cache && npm run build",
-    "deploy": "rm -rf ./node_modules/.cache/gh-pages && gh-pages --no-history -d build"
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build"
   },
   "eslintConfig": {
     "extends": [

@@ -7,9 +7,9 @@ const JWT_SECRET = process.env.JWT_SECRET || 'your-super-secret-key-change-it-la
 // @desc    Register a new user
 // @route   POST /api/users/register
 const registerUser = async (req, res) => {
-  const { username, password, school } = req.body;
+  const { username, password, school = 'Not Specified' } = req.body;
 
-  if (!username || !password || !school) {
+  if (!username || !password) {
     return res.status(400).json({ message: 'Please enter all fields' });
   }
 
