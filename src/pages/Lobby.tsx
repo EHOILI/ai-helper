@@ -104,19 +104,6 @@ function Lobby() {
               >
                 게임하기
               </Button>
-              <Button
-                variant="outlined"
-                size="large"
-                onClick={() => navigate('/tutor')}
-                sx={{ 
-                  py: 2, 
-                  px: 4, 
-                  borderRadius: '50px', 
-                  fontWeight: 'bold',
-                }}
-              >
-                AI 튜터
-              </Button>
             </Box>
           ) : (
             <Button
