@@ -6,19 +6,14 @@ import { useAuth } from '../contexts/AuthContext';
 function RegisterPage() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [school, setSchool] = useState('');
   const [error, setError] = useState('');
   const { register } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(''); // Clear previous errors
-    if (!school) {
-      setError('Please enter your school');
-      return;
-    }
     try {
-      await register(username, password, school);
+      await register(username, password);
     } catch (err: any) {
       // Set error message from backend response if it exists, otherwise a generic one
       const message = err.response?.data?.message || 'An unexpected error occurred. Please try again.';
@@ -64,16 +59,6 @@ function RegisterPage() {
             autoComplete="new-password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-          />
-          <TextField
-            margin="normal"
-            required
-            fullWidth
-            name="school"
-            label="School"
-            id="school"
-            value={school}
-            onChange={(e) => setSchool(e.target.value)}
           />
           <Button
             type="submit"

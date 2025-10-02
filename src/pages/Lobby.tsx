@@ -5,7 +5,6 @@ import { Container, Box, Typography, Button, CircularProgress } from '@mui/mater
 import SchoolIcon from '@mui/icons-material/School';
 import LoginIcon from '@mui/icons-material/Login';
 import LogoutIcon from '@mui/icons-material/Logout';
-import Tutor from '../components/Tutor';
 
 function Lobby() {
   const { user, loading, logout } = useAuth();
@@ -56,61 +55,69 @@ function Lobby() {
           </Typography>
 
           {user ? (
-            <>
-              <Box sx={{ mt: 4 }}>
-                <Typography variant="h6" sx={{ mb: 1 }}>
-                  {user.user.username}님, 환영합니다!
-                </Typography>
-                <Typography color="text.secondary" sx={{ mb: 2 }}>
-                  평판: {user.user.reputation || '스타터'} | XP: {user.user.xp || 0} | 머니: {user.user.money || 0}
-                </Typography>
-                <Button
-                  variant="contained"
-                  size="large"
-                  startIcon={<SchoolIcon />}
-                  onClick={handleStart}
-                  sx={{ 
-                    py: 2, 
-                    px: 4, 
-                    mr: 2,
-                    borderRadius: '50px', 
-                    fontWeight: 'bold',
-                    boxShadow: '0 4px 15px rgba(0, 0, 0, 0.2)'
-                  }}
-                >
-                  학습 시작하기
-                </Button>
-                <Button
-                  variant="outlined"
-                  size="large"
-                  onClick={() => navigate('/ranking')}
-                  sx={{ 
-                    py: 2, 
-                    px: 4, 
-                    borderRadius: '50px', 
-                    fontWeight: 'bold',
-                  }}
-                >
-                  랭킹보기
-                </Button>
-                <Button
-                  variant="outlined"
-                  size="large"
-                  onClick={() => window.open('https://fossil-leo.github.io/pasta/', '_blank')}
-                  sx={{ 
-                    py: 2, 
-                    px: 4, 
-                    borderRadius: '50px', 
-                    fontWeight: 'bold',
-                  }}
-                >
-                  게임하기
-                </Button>
-              </Box>
-              <Box sx={{ mt: 4, display: 'flex', justifyContent: 'center' }}>
-                <Tutor />
-              </Box>
-            </>
+            <Box sx={{ mt: 4 }}>
+              <Typography variant="h6" sx={{ mb: 1 }}>
+                {user.user.username}님, 환영합니다!
+              </Typography>
+              <Typography color="text.secondary" sx={{ mb: 2 }}>
+                평판: {user.user.reputation || '스타터'} | XP: {user.user.xp || 0} | 머니: {user.user.money || 0}
+              </Typography>
+              <Button
+                variant="contained"
+                size="large"
+                startIcon={<SchoolIcon />}
+                onClick={handleStart}
+                sx={{ 
+                  py: 2, 
+                  px: 4, 
+                  mr: 2,
+                  borderRadius: '50px', 
+                  fontWeight: 'bold',
+                  boxShadow: '0 4px 15px rgba(0, 0, 0, 0.2)'
+                }}
+              >
+                학습 시작하기
+              </Button>
+              <Button
+                variant="outlined"
+                size="large"
+                onClick={() => navigate('/ranking')}
+                sx={{ 
+                  py: 2, 
+                  px: 4, 
+                  borderRadius: '50px', 
+                  fontWeight: 'bold',
+                }}
+              >
+                랭킹보기
+              </Button>
+              <Button
+                variant="outlined"
+                size="large"
+                onClick={() => window.open('https://fossil-leo.github.io/pasta/', '_blank')}
+                sx={{ 
+                  py: 2, 
+                  px: 4, 
+                  borderRadius: '50px', 
+                  fontWeight: 'bold',
+                }}
+              >
+                게임하기
+              </Button>
+              <Button
+                variant="outlined"
+                size="large"
+                onClick={() => navigate('/tutor')}
+                sx={{ 
+                  py: 2, 
+                  px: 4, 
+                  borderRadius: '50px', 
+                  fontWeight: 'bold',
+                }}
+              >
+                AI 튜터
+              </Button>
+            </Box>
           ) : (
             <Button
               variant="contained"
