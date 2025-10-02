@@ -5,7 +5,6 @@ import ChatIcon from '@mui/icons-material/Chat';
 import SportsEsportsIcon from '@mui/icons-material/SportsEsports';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import StorefrontIcon from '@mui/icons-material/Storefront';
-import SmartToyIcon from '@mui/icons-material/SmartToy';
 import { useAuth } from '../contexts/AuthContext';
 import ImageIcon from '@mui/icons-material/Image'; // Placeholder Icon
 import axios from 'axios';
@@ -92,9 +91,6 @@ function SelectionPage() {
           </Button>
           <Button variant="outlined" size="large" color="info" startIcon={<AccountCircleIcon />} onClick={() => navigate('/ranking')} sx={{ py: 1.5, borderRadius: '50px', fontWeight: 'bold' }}>
             랭킹보기
-          </Button>
-          <Button variant="outlined" size="large" color="warning" startIcon={<SmartToyIcon />} onClick={() => navigate('/tutor')} sx={{ py: 1.5, borderRadius: '50px', fontWeight: 'bold' }}>
-            AI 튜터
           </Button>
         </Box>
       </Box>
