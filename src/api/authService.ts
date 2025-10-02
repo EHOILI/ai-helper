@@ -4,10 +4,11 @@ import axios from 'axios';
 // Temporarily hardcode the production API URL to fix deployment issues
 const API_URL = `${process.env.REACT_APP_API_URL}/api`;
 
-const register = (username: string, password: string) => {
+const register = (username: string, password: string, school: string) => {
   return axios.post(`${API_URL}/users/register`, {
     username,
     password,
+    school,
   });
 };
 
