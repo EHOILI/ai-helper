@@ -33,6 +33,37 @@ const schoolRoutes = require('./routes/schoolRoutes');
 app.use('/api/schools', schoolRoutes);
 
 
+// --- AI Tutor Route ---
+app.post('/api/tutor/ask', async (req, res) => {
+  try {
+    const { question } = req.body;
+
+    if (!question) {
+      return res.status(400).json({ message: '질문이 필요합니다.' });
+    }
+
+    const prompt = `
+      당신은 지식이 풍부하고 친절한 AI 튜터입니다. 학생의 질문에 대해 명확하고 이해하기 쉽게 설명해주세요.
+
+      질문: "${question}"
+
+      답변:
+    `;
+
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    const text = response.text();
+
+    res.status(200).json({ response: text });
+
+  } catch (error) {
+    console.error('Error in /api/tutor/ask:', error);
+    res.status(500).json({ message: 'AI 튜터 응답 생성 중 오류가 발생했습니다.' });
+  }
+});
+
+
+
 // --- AI Explanation Route ---
 app.post('/api/explain', async (req, res) => {
   try {
