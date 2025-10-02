@@ -19,7 +19,7 @@ interface AuthContextType {
   user: { token: string; user: User } | null;
   loading: boolean;
   login: (username: string, password: string) => Promise<void>;
-  register: (username: string, password: string) => Promise<void>;
+  register: (username: string, password: string, school: string) => Promise<void>;
   logout: () => void;
   updateUser: (newUserData: User) => void;
 }
@@ -62,9 +62,9 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     }
   };
 
-  const register = async (username: string, password: string) => {
+  const register = async (username: string, password: string, school: string) => {
     try {
-      const response = await authService.register(username, password);
+      const response = await authService.register(username, password, school);
       if (response && response.data) {
         localStorage.setItem('user', JSON.stringify(response.data));
         setUser(response.data);
