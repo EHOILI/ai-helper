@@ -1,0 +1,275 @@
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    background-color: #1a1a1a;
+    font-family: sans-serif;
+    color: white;
+    text-align: center;
+    overflow: hidden; /* Prevent scrollbars */
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* --- Start Screen --- */
+#start-screen {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+#start-screen h1 {
+    font-size: 3em;
+    margin: 0;
+}
+
+#enter-selection-button {
+    font-size: 1.5em;
+    padding: 15px 30px;
+    cursor: pointer;
+}
+
+/* --- Song Selection Screen --- */
+#song-selection-screen {
+    display: flex;
+    width: 80vw;
+    height: 70vh;
+    max-width: 1000px;
+    max-height: 600px;
+    background-color: #2c3e50;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+#song-details {
+    flex: 2;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 40px;
+    color: white;
+}
+
+#album-art {
+    width: 250px;
+    height: 250px;
+    border-radius: 10px;
+    margin-bottom: 30px;
+    background-color: #34495e; /* Default placeholder */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    padding: 20px; /* Add padding for SVG */
+    box-sizing: border-box; /* Include padding in size */
+}
+
+#album-art svg {
+    width: 100%;
+    height: 100%;
+}
+
+#song-title {
+    font-size: 2.5em;
+    margin: 0 0 10px 0;
+}
+
+#song-description {
+    font-size: 1.2em;
+    margin-bottom: 30px;
+    color: #bdc3c7;
+}
+
+#play-button {
+    font-size: 1.5em;
+    padding: 15px 60px;
+    border: none;
+    border-radius: 50px;
+    background-color: #e74c3c;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+#play-button:hover {
+    background-color: #c0392b;
+}
+
+#song-list {
+    flex: 1;
+    background-color: rgba(0,0,0,0.2);
+    padding: 20px;
+    overflow-y: auto;
+    border-top-right-radius: 15px;
+    border-bottom-right-radius: 15px;
+}
+
+.song-item {
+    padding: 15px;
+    margin-bottom: 10px;
+    background-color: rgba(255,255,255,0.05);
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    text-align: left;
+}
+
+.song-item:hover {
+    background-color: rgba(255,255,255,0.1);
+}
+
+.song-item.selected {
+    background-color: #e74c3c;
+    font-weight: bold;
+}
+
+
+/* --- Game Container (Original Styles) --- */
+#game-container {
+    position: relative;
+    width: 400px;
+    height: 600px;
+    background-color: #000;
+    border: 2px solid #fff;
+    overflow: hidden;
+}
+
+#info-display {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    right: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    font-size: 20px;
+    z-index: 10;
+}
+
+#exit-button {
+    padding: 5px 10px;
+    font-size: 14px;
+    background-color: #fff;
+    color: #000;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#judgement-display {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 40px; /* Increased font size */
+    font-weight: 900; /* Made font bolder */
+    opacity: 0;
+    transition: all 0.5s;
+    z-index: 10;
+    text-shadow: 2px 2px 4px #000000;
+}
+
+.judgement-perfect {
+    color: #00f2ff; /* Cyan */
+}
+
+.judgement-good {
+    color: #44ff44; /* Green */
+}
+
+.judgement-miss {
+    color: #ff4444; /* Red */
+}
+
+#lanes {
+    display: flex;
+    height: 100%;
+}
+
+.lane {
+    flex: 1;
+    border-left: 1px solid #444;
+    border-right: 1px solid #444;
+    position: relative;
+    transition: background-color 0.1s;
+}
+
+.note {
+    position: absolute;
+    width: 100%;
+    height: 20px;
+    background-color: #ff00de;
+    top: -20px; /* Start above the screen */
+    transition: transform 0.1s, opacity 0.1s;
+}
+
+#target-line {
+    position: absolute;
+    bottom: 50px;
+    width: 100%;
+    height: 5px;
+    background-color: #00f2ff;
+    z-index: 5;
+}
+
+#key-indicators {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    display: flex;
+    height: 50px;
+}
+
+.key {
+    flex: 1;
+    text-align: center;
+    line-height: 50px;
+    font-size: 24px;
+    border-top: 2px solid #fff;
+    border-left: 1px solid #444;
+    border-right: 1px solid #444;
+}
+
+.key.active {
+    background-color: #00f2ff;
+    color: #000;
+}
+
+/* --- Hit Effects --- */
+
+.lane.flash {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.note.hit {
+    transform: scale(0.8);
+    opacity: 0;
+}
+
+.hit-particle {
+    position: absolute;
+    bottom: 40px; /* Centered on the target line */
+    left: 0;
+    width: 100%;
+    height: 20px;
+    background: radial-gradient(circle, rgba(255,255,255,0.8) 0%, rgba(0,242,255,0) 60%);
+    transform: scale(0);
+    animation: particle-burst 0.3s ease-out;
+}
+
+@keyframes particle-burst {
+    0% {
+        transform: scale(0);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(1.5);
+        opacity: 0;
+    }
+}

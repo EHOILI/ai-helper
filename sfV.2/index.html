@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>4-Key Rhythm Game</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="start-screen">
+        <h1>Rhythm Game</h1>
+        <button id="enter-selection-button">Start Game</button>
+    </div>
+
+    <div id="song-selection-screen" class="hidden">
+        <div id="song-details">
+            <div id="album-art"></div>
+            <h2 id="song-title"></h2>
+            <p id="song-description"></p>
+            <button id="play-button">Play</button>
+        </div>
+        <div id="song-list"></div>
+    </div>
+
+    <div id="game-container" class="hidden">
+        <div id="info-display">
+            <div>
+                <div id="score-display">Score: 0</div>
+                <div id="combo-display">Combo: 0</div>
+            </div>
+            <button id="exit-button">나가기</button>
+        </div>
+        <div id="judgement-display"></div>
+        <div id="lanes">
+            <div class="lane" id="lane-0"></div>
+            <div class="lane" id="lane-1"></div>
+            <div class="lane" id="lane-2"></div>
+            <div class="lane" id="lane-3"></div>
+        </div>
+        <div id="target-line"></div>
+        <div id="key-indicators">
+            <div class="key">D</div>
+            <div class="key">F</div>
+            <div class="key">J</div>
+            <div class="key">K</div>
+        </div>
+    </div>
+
+    <audio id="audio-player"></audio>
+    <script src="script.js"></script>
+</body>
+</html>
