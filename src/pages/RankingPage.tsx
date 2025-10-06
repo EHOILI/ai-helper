@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Container, Typography, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Button, Box } from '@mui/material';
-import axios from 'axios';
+import api from '../api';
 import { useNavigate } from 'react-router-dom';
 
 interface SchoolRanking {
@@ -15,7 +15,7 @@ function RankingPage() {
   useEffect(() => {
     const fetchRanking = async () => {
       try {
-        const response = await axios.get('/api/ranking/schools');
+        const response = await api.get('/ranking/schools');
         setRanking(response.data);
       } catch (error) {
         console.error('Failed to fetch school ranking:', error);
