@@ -12,6 +12,7 @@ interface User {
   reputation: string;
   inventory: string[];
   xpBoosterExpires: number | null;
+  equippedTheme: string;
 }
 
 // Define the shape of the context data

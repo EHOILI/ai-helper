@@ -36,7 +36,17 @@ const registerUser = async (req, res) => {
 
     res.status(201).json({
       token,
-      user: { id: user._id, username: user.username, school: user.school },
+      user: {
+        id: user._id,
+        username: user.username,
+        school: user.school,
+        xp: user.xp,
+        money: user.money,
+        reputation: user.reputation,
+        inventory: user.inventory,
+        xpBoosterExpires: user.xpBoosterExpires,
+        equippedTheme: user.equippedTheme,
+      },
     });
   } catch (error) {
     console.error(error);
@@ -77,6 +87,7 @@ const loginUser = async (req, res) => {
         reputation: user.reputation,
         inventory: user.inventory,
         xpBoosterExpires: user.xpBoosterExpires,
+        equippedTheme: user.equippedTheme,
       },
     });
   } catch (error) {
@@ -141,8 +152,44 @@ const updateUserProgress = async (req, res) => {
 };
 
 
+const equipTheme = async (req, res) => {
+  const { userId, themeName } = req.body;
+
+  try {
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // 테마 소유 여부 확인 (인벤토리에 테마 이름이 포함되어 있는지)
+    if (!user.inventory.includes(themeName)) {
+      return res.status(400).json({ message: '보유하지 않은 테마입니다.' });
+    }
+
+    user.equippedTheme = themeName;
+    const updatedUser = await user.save();
+
+    res.status(200).json({
+      id: updatedUser._id,
+      username: updatedUser.username,
+      xp: updatedUser.xp,
+      money: updatedUser.money,
+      reputation: updatedUser.reputation,
+      inventory: updatedUser.inventory,
+      xpBoosterExpires: updatedUser.xpBoosterExpires,
+      equippedTheme: updatedUser.equippedTheme,
+    });
+
+  } catch (error) {
+    console.error('Error equipping theme:', error);
+    res.status(500).json({ message: '테마 적용 중 서버 오류가 발생했습니다.' });
+  }
+};
+
 module.exports = {
   registerUser,
   loginUser,
   updateUserProgress,
+  equipTheme,
 };

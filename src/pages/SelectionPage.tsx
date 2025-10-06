@@ -8,6 +8,7 @@ import StorefrontIcon from '@mui/icons-material/Storefront';
 import { useAuth } from '../contexts/AuthContext';
 import ImageIcon from '@mui/icons-material/Image'; // Placeholder Icon
 import axios from 'axios';
+import Tutor from '../components/Tutor'; // Import Tutor component
 
 const modalStyle = {
   position: 'absolute' as 'absolute',
@@ -22,9 +23,18 @@ const modalStyle = {
   color: 'black'
 };
 
-const shopItems = [
-  { name: '캐릭터 스킨 1', cost: 1000 },
-  { name: 'XP 2배 부스터 (1일)', cost: 5000 },
+interface ShopItem {
+  id: string;
+  name: string;
+  cost: number;
+  type: 'skin' | 'booster' | 'theme';
+}
+
+const shopItems: ShopItem[] = [
+  { id: 'skin-1', name: '캐릭터 스킨 1', cost: 1000, type: 'skin' },
+  { id: 'xp-booster-1', name: 'XP 2배 부스터 (1일)', cost: 5000, type: 'booster' },
+  { id: 'theme-dark', name: '다크 테마', cost: 1000, type: 'theme' },
+  { id: 'theme-blue', name: '블루 테마', cost: 500, type: 'theme' },
 ];
 
 function SelectionPage() {
@@ -32,6 +42,7 @@ function SelectionPage() {
   const { user, updateUser } = useAuth();
   const [reputationOpen, setReputationOpen] = useState(false);
   const [shopOpen, setShopOpen] = useState(false);
+  const [showTutor, setShowTutor] = useState(false); // State for Tutor visibility
   const [alertInfo, setAlertInfo] = useState<{ open: boolean, message: string, severity: 'success' | 'error' }>({ open: false, message: '', severity: 'success' });
 
   const handleBuyItem = async (itemName: string, itemCost: number) => {
@@ -47,6 +58,22 @@ function SelectionPage() {
       setAlertInfo({ open: true, message: '구매 완료!', severity: 'success' });
     } catch (error: any) {
       const message = error.response?.data?.message || '구매 중 오류가 발생했습니다.';
+      setAlertInfo({ open: true, message, severity: 'error' });
+    }
+  };
+
+  const handleEquipTheme = async (themeName: string) => {
+    if (!user) return;
+
+    try {
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/users/equip-theme`, {
+        userId: user.user.id,
+        themeName,
+      });
+      updateUser(response.data);
+      setAlertInfo({ open: true, message: '테마가 적용되었습니다!', severity: 'success' });
+    } catch (error: any) {
+      const message = error.response?.data?.message || '테마 적용 중 오류가 발생했습니다.';
       setAlertInfo({ open: true, message, severity: 'error' });
     }
   };
@@ -92,8 +119,17 @@ function SelectionPage() {
           <Button variant="outlined" size="large" color="info" startIcon={<AccountCircleIcon />} onClick={() => navigate('/ranking')} sx={{ py: 1.5, borderRadius: '50px', fontWeight: 'bold' }}>
             랭킹보기
           </Button>
+          <Button variant="contained" size="large" color="primary" onClick={() => setShowTutor(true)} sx={{ py: 1.5, borderRadius: '50px', fontWeight: 'bold' }}>
+            AI 튜터
+          </Button>
         </Box>
       </Box>
+
+      {showTutor && (
+        <Box sx={{ mt: 4, display: 'flex', justifyContent: 'center' }}>
+          <Tutor onClose={() => setShowTutor(false)} />
+        </Box>
+      )}
 
       {/* Reputation Modal */}
       <Modal open={reputationOpen} onClose={() => setReputationOpen(false)}>
@@ -115,17 +151,16 @@ function SelectionPage() {
           <Typography variant="body2" sx={{ mb: 2 }}>현재 보유 머니: {user?.user.money || 0}</Typography>
           <List>
             {shopItems.map((item) => {
-              const isBooster = item.name.includes('부스터');
-              const isBoosterActive = !!(isBooster && user?.user.xpBoosterExpires && user.user.xpBoosterExpires > Date.now());
-              const isOwned = !!(!isBooster && user?.user.inventory?.includes(item.name));
+              const isBooster = item.type === 'booster';
+              const isTheme = item.type === 'theme';
+              
+              const isOwned = user?.user.inventory?.includes(item.name) || false;
+              const isBoosterActive = !!(isBooster && user?.user.xpBoosterExpires && new Date(user.user.xpBoosterExpires) > new Date());
+              const isEquipped = isTheme && user?.user.equippedTheme === item.name;
               const canAfford = (user?.user.money || 0) >= item.cost;
 
-              let buttonText = '구매';
-              if (isOwned) buttonText = '보유중';
-              if (isBoosterActive) buttonText = '활성 중';
-
               return (
-                <React.Fragment key={item.name}>
+                <React.Fragment key={item.id}>
                   <ListItem>
                     <ListItemAvatar><Avatar><ImageIcon /></Avatar></ListItemAvatar>
                     <ListItemText 
@@ -135,13 +170,33 @@ function SelectionPage() {
                         : `${item.cost} 머니`
                       } 
                     />
-                    <Button 
-                      variant="contained" 
-                      onClick={() => handleBuyItem(item.name, item.cost)}
-                      disabled={!canAfford || isOwned || isBoosterActive}
-                    >
-                      {buttonText}
-                    </Button>
+                    {isTheme ? (
+                      isOwned ? (
+                        <Button
+                          variant="contained"
+                          onClick={() => handleEquipTheme(item.name)}
+                          disabled={isEquipped}
+                        >
+                          {isEquipped ? '적용됨' : '적용하기'}
+                        </Button>
+                      ) : (
+                        <Button
+                          variant="contained"
+                          onClick={() => handleBuyItem(item.name, item.cost)}
+                          disabled={!canAfford}
+                        >
+                          구매
+                        </Button>
+                      )
+                    ) : (
+                      <Button
+                        variant="contained"
+                        onClick={() => handleBuyItem(item.name, item.cost)}
+                        disabled={!canAfford || isOwned || isBoosterActive}
+                      >
+                        {isOwned ? '보유중' : (isBoosterActive ? '활성 중' : '구매')}
+                      </Button>
+                    )}
                   </ListItem>
                   <Divider />
                 </React.Fragment>

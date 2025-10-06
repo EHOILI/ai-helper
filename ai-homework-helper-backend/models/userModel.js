@@ -33,6 +33,10 @@ const userSchema = new mongoose.Schema({
     type: Date,
     default: null,
   },
+  equippedTheme: {
+    type: String,
+    default: 'default',
+  },
 }, {
   timestamps: true, // Adds createdAt and updatedAt timestamps
 });

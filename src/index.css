@@ -3,3 +3,23 @@
 @import url('https://fonts.googleapis.com/css2?family=Cute+Font&display=swap');
 
 /* Other global styles can go here, but body font styles are now handled by MUI theme. */
+
+/* Theme Styles */
+body {
+  transition: background-color 0.3s, color 0.3s;
+}
+
+body.theme-default {
+  background-color: #ffffff;
+  color: #282c34;
+}
+
+body.theme-dark {
+  background-color: #282c34;
+  color: #ffffff;
+}
+
+body.theme-blue {
+  background-color: #e3f2fd;
+  color: #000000;
+}

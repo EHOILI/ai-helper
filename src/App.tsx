@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import Lobby from './pages/Lobby';
 import LoginPage from './pages/LoginPage';
@@ -7,9 +7,17 @@ import ChatPage from './pages/ChatPage';
 import GamePage from './pages/GamePage';
 import SelectionPage from './pages/SelectionPage';
 import RankingPage from './pages/RankingPage';
+import { useAuth } from './contexts/AuthContext';
 import './App.css';
 
 function App() {
+  const { user } = useAuth();
+
+  useEffect(() => {
+    const theme = user?.user?.equippedTheme || 'default';
+    document.body.className = `theme-${theme}`;
+  }, [user]);
+
   return (
     <Routes>
       <Route path="/" element={<Lobby />} />
