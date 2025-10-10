@@ -107,9 +107,7 @@ function Lobby() {
                   게임하기
                 </Button>
               </Box>
-              <Box sx={{ mt: 4, display: 'flex', justifyContent: 'center' }}>
-                <Tutor />
-              </Box>
+
             </>
           ) : (
             <Button
