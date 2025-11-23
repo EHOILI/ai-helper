@@ -52,7 +52,7 @@ function Lobby() {
             AI Homework Helper
           </Typography>
           <Typography variant="h5" component="p" color="rgba(0, 0, 0, 0.6)" paragraph>
-            숙제, 질문, 그리고 게임까지. 당신의 AI 학습 파트너와 함께하세요.
+            숙제, 질문. 당신의 AI 학습 파트너와 함께하세요.
           </Typography>
 
           {user ? (
@@ -92,19 +92,6 @@ function Lobby() {
                   }}
                 >
                   랭킹보기
-                </Button>
-                <Button
-                  variant="outlined"
-                  size="large"
-                  onClick={() => window.open('https://fossil-leo.github.io/pasta/', '_blank')}
-                  sx={{ 
-                    py: 2, 
-                    px: 4, 
-                    borderRadius: '50px', 
-                    fontWeight: 'bold',
-                  }}
-                >
-                  게임하기
                 </Button>
               </Box>
 

@@ -35,7 +35,7 @@ function Chat() {
     return <div>Loading...</div>;
   }
   // context에서 필요한 모든 변수를 구조 분해 할당
-  const { setGameMoney, addCalendarEvent, solvedProblems, addSolvedProblem, updateLearningProgress, userAge, setUserAge, learningProgress } = context;
+  const { setMoney, addCalendarEvent, solvedProblems, addSolvedProblem, updateLearningProgress, userAge, setUserAge, learningProgress } = context;
 
   // --- AI 비서의 지식 베이스 (확장 가능) ---
   const knowledgeBase: { [key: string]: string } = {
@@ -245,8 +245,8 @@ function Chat() {
       const userAnswerText = input.trim().replace(/개$/, '');
       const userAnswer = parseInt(userAnswerText);
       if (!isNaN(userAnswer) && userAnswer === currentProblem.answer) {
-        botResponseText = '정답입니다! 게임 머니 50을 획득했습니다.';
-        setGameMoney(prevMoney => prevMoney + 50);
+        botResponseText = '정답입니다! 머니 50을 획득했습니다.';
+        setMoney(prevMoney => prevMoney + 50);
         addSolvedProblem({ question: currentProblem.question, answer: currentProblem.answer, explanation: currentProblem.explanation }); // 풀었던 문제 저장
         updateLearningProgress({ correctAnswers: (learningProgress.correctAnswers || 0) + 1 });
         setCurrentProblem(null);

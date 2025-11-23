@@ -2,9 +2,19 @@
 node_modules/
 ai-homework-helper-backend/node_modules/
 
+# Cache
+.npm-cache/
+
 # Environment variables
 .env
 ai-homework-helper-backend/.env
 
 # Data files
 school/
+
+# Build directory
+build/
+
+# Other
+.DS_Store
+sfV.2/
