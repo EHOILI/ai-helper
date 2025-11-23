@@ -30,8 +30,8 @@ export interface LearningProgress {
 interface AppContextProps {
   reputation: ReputationLevel;
   setReputation: React.Dispatch<React.SetStateAction<ReputationLevel>>;
-  money: number;
-  setMoney: React.Dispatch<React.SetStateAction<number>>;
+  gameMoney: number;
+  setGameMoney: React.Dispatch<React.SetStateAction<number>>;
   inventory: Item[];
   buyItem: (item: Item) => void;
   calendarEvents: CalendarEvent[];
@@ -42,7 +42,10 @@ interface AppContextProps {
   updateLearningProgress: (data: Partial<LearningProgress>) => void;
   userAge: number | null; // 사용자 나이 추가
   setUserAge: React.Dispatch<React.SetStateAction<number | null>>; // 사용자 나이 설정 함수 추가
-
+  wormGameMoney: number; // 지렁이 게임 머니
+  setWormGameMoney: React.Dispatch<React.SetStateAction<number>>; // 지렁이 게임 머니 설정 함수
+  platformerGameMoney: number; // 플랫포머 게임 머니
+  setPlatformerGameMoney: React.Dispatch<React.SetStateAction<number>>; // 플랫포머 게임 머니 설정 함수
 }
 
 export const AppContext = createContext<AppContextProps | undefined>(undefined);
@@ -53,8 +56,8 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     return (savedReputation as ReputationLevel) || '스타터';
   });
 
-  const [money, setMoney] = useState<number>(() => {
-    const savedGameMoney = localStorage.getItem('money');
+  const [gameMoney, setGameMoney] = useState<number>(() => {
+    const savedGameMoney = localStorage.getItem('gameMoney');
     return savedGameMoney ? parseInt(savedGameMoney, 10) : 0;
   });
 
@@ -83,15 +86,23 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     return savedAge ? parseInt(savedAge, 10) : null;
   });
 
+  const [wormGameMoney, setWormGameMoney] = useState<number>(() => {
+    const savedWormGameMoney = localStorage.getItem('wormGameMoney');
+    return savedWormGameMoney ? parseInt(savedWormGameMoney, 10) : 0;
+  });
 
+  const [platformerGameMoney, setPlatformerGameMoney] = useState<number>(() => {
+    const savedPlatformerGameMoney = localStorage.getItem('platformerGameMoney');
+    return savedPlatformerGameMoney ? parseInt(savedPlatformerGameMoney, 10) : 0;
+  });
 
   useEffect(() => {
     localStorage.setItem('reputation', reputation);
   }, [reputation]);
 
   useEffect(() => {
-    localStorage.setItem('money', money.toString());
-  }, [money]);
+    localStorage.setItem('gameMoney', gameMoney.toString());
+  }, [gameMoney]);
 
   useEffect(() => {
     localStorage.setItem('inventory', JSON.stringify(inventory));
@@ -117,15 +128,21 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     }
   }, [userAge]);
 
+  useEffect(() => {
+    localStorage.setItem('wormGameMoney', wormGameMoney.toString());
+  }, [wormGameMoney]);
 
+  useEffect(() => {
+    localStorage.setItem('platformerGameMoney', platformerGameMoney.toString());
+  }, [platformerGameMoney]);
 
   const buyItem = (item: Item) => {
-    if (money >= item.price) {
-      setMoney(money - item.price);
+    if (gameMoney >= item.price) {
+      setGameMoney(gameMoney - item.price);
       setInventory([...inventory, item]);
       alert(`${item.name}을(를) 구매했습니다!`);
     } else {
-      alert('머니가 부족합니다.');
+      alert('게임 머니가 부족합니다.');
     }
   };
 
@@ -145,13 +162,15 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   return (
     <AppContext.Provider value={{
       reputation, setReputation,
-      money, setMoney,
+      gameMoney, setGameMoney,
       inventory, buyItem,
       calendarEvents, addCalendarEvent,
       solvedProblems, addSolvedProblem,
       learningProgress, updateLearningProgress,
       userAge, setUserAge,
-    >
+      wormGameMoney, setWormGameMoney,
+      platformerGameMoney, setPlatformerGameMoney
+    }}>
       {children}
     </AppContext.Provider>
   );
