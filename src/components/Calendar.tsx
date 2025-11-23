@@ -74,7 +74,7 @@ function Calendar() {
           sortedDates.map(date => (
             <div key={date} className="date-group">
               <h3>{date}</h3>
-              {groupedEvents[date].map(event => (
+              {groupedEvents[date].map((event: CalendarEvent) => (
                 <div key={event.id} className="event-item">
                   <span>{event.title}</span>
                   {/* 삭제 기능은 AppContext에 추가해야 합니다. */}
