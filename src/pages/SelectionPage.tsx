@@ -6,6 +6,7 @@ import SportsEsportsIcon from '@mui/icons-material/SportsEsports';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import StorefrontIcon from '@mui/icons-material/Storefront';
 import { useAuth } from '../contexts/AuthContext';
+import { ShopItem, shopItems } from '../data/shopItems'; // Import from central source
 import ImageIcon from '@mui/icons-material/Image'; // Placeholder Icon
 import axios from 'axios';
 import Tutor from '../components/Tutor'; // Import Tutor component
@@ -22,21 +23,6 @@ const modalStyle = {
   p: 4,
   color: 'black'
 };
-
-interface ShopItem {
-  id: string;
-  name: string;
-  cost: number;
-  type: 'skin' | 'booster' | 'theme' | 'ticket';
-}
-
-const shopItems: ShopItem[] = [
-  { id: 'skin-1', name: '캐릭터 스킨 1', cost: 1000, type: 'skin' },
-  { id: 'xp-booster-1', name: 'XP 2배 부스터 (1일)', cost: 5000, type: 'booster' },
-  { id: 'theme-dark', name: '다크 테마', cost: 1000, type: 'theme' },
-  { id: 'theme-blue', name: '블루 테마', cost: 500, type: 'theme' },
-  { id: 'explanation-ticket', name: '해설권', cost: 50, type: 'ticket' },
-];
 
 function SelectionPage() {
   const navigate = useNavigate();

@@ -7,6 +7,7 @@ import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import theme from './theme';
 import { AuthProvider } from './contexts/AuthContext';
+import { AppProvider } from './contexts/AppContext'; // Import AppProvider
 import { HashRouter as Router } from 'react-router-dom';
 
 const root = ReactDOM.createRoot(
@@ -18,7 +19,9 @@ root.render(
       <CssBaseline />
       <Router>
         <AuthProvider>
-          <App />
+          <AppProvider> {/* Add AppProvider here */}
+            <App />
+          </AppProvider>
         </AuthProvider>
       </Router>
     </ThemeProvider>

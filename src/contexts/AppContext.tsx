@@ -1,15 +1,11 @@
-import React, { createContext, useState, useEffect, ReactNode, useContext } from 'react';
-import { useAuth } from './AuthContext'; // Import useAuth
-import api from '../api'; // Import your API instance
+import React, { createContext, useState, useEffect, ReactNode } from 'react';
+import { useAuth } from './AuthContext';
+import { ShopItem, shopItems } from '../data/shopItems'; // Import from central source
 
 export type ReputationLevel = '스타터' | '루키' | '미들' | '리더' | '프로' | '마스터';
 
-export interface Item {
-  id: string;
-  name: string;
-  description: string;
-  price: number;
-}
+// Use the imported ShopItem interface
+export type Item = ShopItem;
 
 export interface CalendarEvent {
   id: string;
@@ -35,7 +31,6 @@ interface AppContextProps {
   gameMoney: number;
   setGameMoney: React.Dispatch<React.SetStateAction<number>>;
   inventory: Item[];
-  buyItem: (item: Item) => Promise<void>; // Change to async function
   calendarEvents: CalendarEvent[];
   addCalendarEvent: (event: Omit<CalendarEvent, 'id'>) => void;
   solvedProblems: SolvedProblem[];
@@ -53,7 +48,7 @@ interface AppContextProps {
 export const AppContext = createContext<AppContextProps | undefined>(undefined);
 
 export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const { user: authUser, updateUser } = useAuth(); // Get user and updateUser from AuthContext
+  const { user: authUser } = useAuth(); // Get user from AuthContext
 
   const [reputation, setReputation] = useState<ReputationLevel>(() => {
     const savedReputation = localStorage.getItem('reputation');
@@ -65,10 +60,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     return savedGameMoney ? parseInt(savedGameMoney, 10) : 0;
   });
 
-  const [inventory, setInventory] = useState<Item[]>(() => {
-    const savedInventory = localStorage.getItem('inventory');
-    return savedInventory ? JSON.parse(savedInventory) : [];
-  });
+  const [inventory, setInventory] = useState<Item[]>([]);
 
   const [calendarEvents, setCalendarEvents] = useState<CalendarEvent[]>(() => {
     const savedEvents = localStorage.getItem('calendarEvents');
@@ -104,6 +96,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   useEffect(() => {
     if (authUser && authUser.user) {
       setGameMoney(authUser.user.money);
+      // Now using the imported, authoritative shopItems list
       const authInventoryItems: Item[] = shopItems.filter(shopItem => authUser.user.inventory.includes(shopItem.name));
       setInventory(authInventoryItems);
     } else {
@@ -152,45 +145,6 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     localStorage.setItem('platformerGameMoney', platformerGameMoney.toString());
   }, [platformerGameMoney]);
 
-  const shopItems: Item[] = [
-    { id: 'skin-1', name: '귀여운 아바타 스킨', description: 'AI 비서의 외형을 귀엽게 바꿔줍니다.', price: 500 },
-    { id: 'speed-boost', name: '지렁이 속도 부스터', description: '지렁이 게임에서 지렁이의 속도를 일시적으로 증가시킵니다.', price: 200 },
-    { id: 'extra-life', name: '플랫포머 추가 목숨', description: '플랫포머 게임에서 추가 목숨을 얻습니다.', price: 300 },
-    { id: 'hint-ticket', name: '문제 해설 힌트', description: '문제 해설 시 힌트를 얻을 수 있는 티켓입니다.', price: 100 },
-  ];
-
-  const buyItem = async (item: Item) => { // Make buyItem async
-    if (!authUser || !authUser.user || !authUser.token) {
-      alert('로그인이 필요합니다.');
-      return;
-    }
-
-    try {
-      const response = await api.post('/api/shop/buy', {
-        userId: authUser.user.id,
-        itemName: item.name, // Send item.name as itemName
-        itemCost: item.price,
-      }, {
-        headers: {
-          Authorization: `Bearer ${authUser.token}`,
-        },
-      });
-
-      if (response.status === 200) {
-        const updatedUser = response.data.user; // Backend should return updated user
-        updateUser(updatedUser); // Update user in AuthContext
-
-        // AppContext states will be synced via useEffect on authUser change
-        alert(`${item.name}을(를) 구매했습니다!`);
-      } else {
-        alert(response.data.message || '아이템 구매에 실패했습니다.');
-      }
-    } catch (error: any) {
-      console.error('Failed to buy item:', error);
-      alert(error.response?.data?.message || '아이템 구매 중 오류가 발생했습니다.');
-    }
-  };
-
   const addCalendarEvent = (event: Omit<CalendarEvent, 'id'>) => {
     const newEvent: CalendarEvent = { ...event, id: Date.now().toString() };
     setCalendarEvents(prevEvents => [...prevEvents, newEvent]);
@@ -208,7 +162,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     <AppContext.Provider value={{
       reputation, setReputation,
       gameMoney, setGameMoney,
-      inventory, buyItem,
+      inventory,
       calendarEvents, addCalendarEvent,
       solvedProblems, addSolvedProblem,
       learningProgress, updateLearningProgress,
