@@ -27,7 +27,7 @@ interface ShopItem {
   id: string;
   name: string;
   cost: number;
-  type: 'skin' | 'booster' | 'theme';
+  type: 'skin' | 'booster' | 'theme' | 'ticket';
 }
 
 const shopItems: ShopItem[] = [
@@ -35,6 +35,7 @@ const shopItems: ShopItem[] = [
   { id: 'xp-booster-1', name: 'XP 2배 부스터 (1일)', cost: 5000, type: 'booster' },
   { id: 'theme-dark', name: '다크 테마', cost: 1000, type: 'theme' },
   { id: 'theme-blue', name: '블루 테마', cost: 500, type: 'theme' },
+  { id: 'explanation-ticket', name: '해설권', cost: 50, type: 'ticket' },
 ];
 
 function SelectionPage() {
@@ -192,9 +193,13 @@ function SelectionPage() {
                       <Button
                         variant="contained"
                         onClick={() => handleBuyItem(item.name, item.cost)}
-                        disabled={!canAfford || isOwned || isBoosterActive}
+                        disabled={
+                          !canAfford ||
+                          (item.type !== 'ticket' && isOwned) ||
+                          isBoosterActive
+                        }
                       >
-                        {isOwned ? '보유중' : (isBoosterActive ? '활성 중' : '구매')}
+                        {(isOwned && item.type !== 'ticket') ? '보유중' : (isBoosterActive ? '활성 중' : '구매')}
                       </Button>
                     )}
                   </ListItem>

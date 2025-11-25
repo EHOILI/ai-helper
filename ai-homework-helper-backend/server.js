@@ -208,6 +208,47 @@ app.post('/api/user/easter-egg', async (req, res) => {
   }
 });
 
+// --- Use Explanation Ticket Route ---
+app.post('/api/user/use-explanation-ticket', async (req, res) => {
+  try {
+    const { userId } = req.body;
+    if (userId === undefined) {
+      return res.status(400).json({ message: 'User ID is required' });
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    if (user.explanationTickets <= 0) {
+      return res.status(400).json({ message: '해설권이 부족합니다.' });
+    }
+
+    user.explanationTickets -= 1;
+    const updatedUser = await user.save();
+
+    res.status(200).json({
+      message: 'Explanation ticket used.',
+      user: {
+        id: updatedUser._id,
+        username: updatedUser.username,
+        xp: updatedUser.xp,
+        money: updatedUser.money,
+        reputation: updatedUser.reputation,
+        inventory: updatedUser.inventory,
+        xpBoosterExpires: updatedUser.xpBoosterExpires,
+        explanationTickets: updatedUser.explanationTickets,
+      },
+    });
+
+  } catch (error) {
+    console.error('Error in /api/user/use-explanation-ticket:', error);
+    res.status(500).json({ message: 'Failed to use explanation ticket' });
+  }
+});
+
+
 // --- Shop Route ---
 app.post('/api/shop/buy', async (req, res) => {
   try {
@@ -232,7 +273,10 @@ app.post('/api/shop/buy', async (req, res) => {
         return res.status(400).json({ message: '이미 부스터가 활성화되어 있습니다.' });
       }
       user.xpBoosterExpires = Date.now() + 24 * 60 * 60 * 1000; // 24 hours from now
-    } else {
+    } else if (itemName === '해설권') {
+      user.explanationTickets = (user.explanationTickets || 0) + 1;
+    }
+    else {
       if (user.inventory.includes(itemName)) {
         return res.status(400).json({ message: '이미 보유한 아이템입니다.' });
       }
@@ -253,6 +297,7 @@ app.post('/api/shop/buy', async (req, res) => {
         reputation: updatedUser.reputation,
         inventory: updatedUser.inventory,
         xpBoosterExpires: updatedUser.xpBoosterExpires,
+        explanationTickets: updatedUser.explanationTickets,
       },
     });
 

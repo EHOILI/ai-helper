@@ -21,6 +21,10 @@ const userSchema = new mongoose.Schema({
     type: Number,
     default: 0,
   },
+  explanationTickets: {
+    type: Number,
+    default: 3,
+  },
   reputation: {
     type: String,
     default: '루키',
