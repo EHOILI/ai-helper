@@ -50,7 +50,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     try {
       const response = await authService.login(username, password);
       if (response && response.data) {
-        navigate('/lobby');
+        navigate('/');
       } else {
         throw new Error('Login failed: Invalid response from server');
       }
