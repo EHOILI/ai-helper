@@ -31,24 +31,25 @@ interface AppContextProps {
   gameMoney: number;
   setGameMoney: React.Dispatch<React.SetStateAction<number>>;
   inventory: Item[];
+  buyItem: (item: Item) => void; // Add buyItem to props
   calendarEvents: CalendarEvent[];
   addCalendarEvent: (event: Omit<CalendarEvent, 'id'>) => void;
   solvedProblems: SolvedProblem[];
   addSolvedProblem: (problem: SolvedProblem) => void;
   learningProgress: LearningProgress;
   updateLearningProgress: (data: Partial<LearningProgress>) => void;
-  userAge: number | null; // 사용자 나이 추가
-  setUserAge: React.Dispatch<React.SetStateAction<number | null>>; // 사용자 나이 설정 함수 추가
-  wormGameMoney: number; // 지렁이 게임 머니
-  setWormGameMoney: React.Dispatch<React.SetStateAction<number>>; // 지렁이 게임 머니 설정 함수
-  platformerGameMoney: number; // 플랫포머 게임 머니
-  setPlatformerGameMoney: React.Dispatch<React.SetStateAction<number>>; // 플랫포머 게임 머니 설정 함수
+  userAge: number | null;
+  setUserAge: React.Dispatch<React.SetStateAction<number | null>>;
+  wormGameMoney: number;
+  setWormGameMoney: React.Dispatch<React.SetStateAction<number>>;
+  platformerGameMoney: number;
+  setPlatformerGameMoney: React.Dispatch<React.SetStateAction<number>>;
 }
 
 export const AppContext = createContext<AppContextProps | undefined>(undefined);
 
 export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const { user: authUser } = useAuth(); // Get user from AuthContext
+  const { user: authUser, updateUser } = useAuth(); // Get user and updateUser from AuthContext
 
   const [reputation, setReputation] = useState<ReputationLevel>(() => {
     const savedReputation = localStorage.getItem('reputation');
@@ -158,11 +159,29 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     setLearningProgress(prevProgress => ({ ...prevProgress, ...data }));
   };
 
+  const buyItem = (item: Item) => {
+    if (authUser && authUser.user && gameMoney >= item.cost) {
+      const newMoney = gameMoney - item.cost;
+      const newInventory = [...inventory, item];
+      
+      setGameMoney(newMoney);
+      setInventory(newInventory);
+      
+      // Update the user data in AuthContext
+      const updatedUserData = {
+        ...authUser.user,
+        money: newMoney,
+        inventory: [...authUser.user.inventory, item.name], // Add item name to inventory
+      };
+      updateUser(updatedUserData);
+    }
+  };
+
   return (
     <AppContext.Provider value={{
       reputation, setReputation,
       gameMoney, setGameMoney,
-      inventory,
+      inventory, buyItem,
       calendarEvents, addCalendarEvent,
       solvedProblems, addSolvedProblem,
       learningProgress, updateLearningProgress,
